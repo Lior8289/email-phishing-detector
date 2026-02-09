@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic
+joblib
+scikit-learn
+pytest
+httpx
+tldextract
+beautifulsoup4
+lxml
+jinja2

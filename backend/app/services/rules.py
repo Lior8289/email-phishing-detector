@@ -146,6 +146,27 @@ def run_rules(from_addr: str, subject: str, body: str):
     hits: list[dict] = []
     links = extract_links(text)[:20]
 
+    # === SENDER CHECKS ===
+    if from_addr and '@' in from_addr:
+        sender_domain = from_addr.split('@')[-1].lower()
+
+        # Check sender domain for typosquatting
+        is_typosquat, brand = check_typosquatting(sender_domain)
+        if is_typosquat:
+            hits.append({"id": "sender_typosquatting", "severity": 9, "message": f"Sender domain impersonates '{brand}': {sender_domain}"})
+
+        # Check sender domain for suspicious patterns
+        domain_issues = check_suspicious_domain_patterns(sender_domain)
+        if domain_issues:
+            hits.append({"id": "suspicious_sender_domain", "severity": 4, "message": f"Suspicious sender domain: {', '.join(domain_issues)}"})
+
+    # === SUBJECT CHECKS ===
+    # Urgent patterns in subject line are more suspicious than in body
+    if subject:
+        subject_urgent = sum(1 for p in URGENT_PATTERNS if re.search(p, subject, re.IGNORECASE))
+        if subject_urgent >= 1:
+            hits.append({"id": "urgent_subject", "severity": 5, "message": "Urgent language in subject line."})
+
     # Urgent language check
     urgent_count = sum(1 for p in URGENT_PATTERNS if re.search(p, text, re.IGNORECASE))
     if urgent_count >= 2:

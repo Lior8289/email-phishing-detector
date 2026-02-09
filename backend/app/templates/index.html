@@ -451,13 +451,35 @@
           idx = Math.floor(Math.random() * examples.length);
         } while (idx === lastIndex && examples.length > 1);
         lastIndex = idx;
+
         const ex = examples[idx];
         $("from_addr").value = ex.from;
         $("subject").value = ex.subject;
         $("body").value = ex.body;
       };
 
-      $("scanBtn").onclick = async () => {
+      // --- Query helpers ---
+      function getParam(name) {
+        return new URL(window.location.href).searchParams.get(name);
+      }
+
+      function prefillFromQuery() {
+        const fromQ = getParam("from");
+        const subjectQ = getParam("subject");
+        const bodyQ = getParam("body");
+
+        const hasAny = !!(fromQ || subjectQ || bodyQ);
+        if (!hasAny) return { hasAny: false };
+
+        if (fromQ) $("from_addr").value = fromQ;
+        if (subjectQ) $("subject").value = subjectQ;
+        if (bodyQ) $("body").value = bodyQ;
+
+        return { hasAny: true };
+      }
+
+      // --- Core scan function (manual + auto) ---
+      async function doScan() {
         $("status").textContent = "Scanning…";
         document.body.classList.add("scanning");
         $("result").innerHTML = "";
@@ -475,12 +497,9 @@
             body: JSON.stringify(payload),
           });
 
-          if (!res.ok) {
-            const txt = await res.text();
-            throw new Error(txt);
-          }
-
+          if (!res.ok) throw new Error(await res.text());
           const data = await res.json();
+
           const confPct = Math.round((data.confidence || 0) * 100);
           const mlPct =
             data.ml_probability == null
@@ -488,23 +507,24 @@
               : Math.round(data.ml_probability * 100) + "%";
 
           let html = `<div class="fade-in">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="${badgeClass(data.classification)}">${data.classification}</span>
-                    </div>
-                    <div class="stat-row">
-                        <div class="stat">
-                            <div class="stat-label">Confidence</div>
-                            <div class="stat-value">${confPct}%</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">ML Prob</div>
-                            <div class="stat-value">${mlPct}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Rules</div>
-                            <div class="stat-value">${data.rules_score}</div>
-                        </div>
-                    </div>`;
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="${badgeClass(data.classification)}">${data.classification}</span>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-label">Confidence</div>
+            <div class="stat-value">${confPct}%</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">ML Prob</div>
+            <div class="stat-value">${mlPct}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Rules</div>
+            <div class="stat-value">${data.rules_score}</div>
+          </div>
+        </div>`;
 
           if (data.rule_hits && data.rule_hits.length) {
             html += `<h4>Why?</h4><ul>`;
@@ -519,7 +539,9 @@
           if (data.extracted_links && data.extracted_links.length) {
             html += `<h4>Extracted links</h4><ul>`;
             for (const link of data.extracted_links.slice(0, 8)) {
-              const safe = link.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+              const safe = String(link)
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
               html += `<li><a href="${safe}" target="_blank" rel="noreferrer">${safe}</a></li>`;
             }
             html += `</ul>`;
@@ -530,11 +552,27 @@
           $("status").textContent = "Done ✓";
         } catch (e) {
           $("result").innerHTML =
-            `<div class="fade-in" style="color:var(--phish-text); background:var(--phish-bg); padding:14px; border-radius:10px;"><b>Error:</b> ${String(e.message).slice(0, 300)}</div>`;
+            `<div class="fade-in" style="color:var(--phish-text); background:var(--phish-bg); padding:14px; border-radius:10px;">
+          <b>Error:</b> ${String(e.message).slice(0, 350)}
+        </div>`;
           $("status").textContent = "";
+        } finally {
+          document.body.classList.remove("scanning");
         }
-        document.body.classList.remove("scanning");
-      };
+      }
+
+      // Manual scan button
+      $("scanBtn").onclick = doScan;
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const { hasAny } = prefillFromQuery();
+
+        if (hasAny) {
+          doScan();
+          // clean the URL after reading params (hides long body)
+          history.replaceState({}, "", "/");
+        }
+      });
     </script>
   </body>
 </html>

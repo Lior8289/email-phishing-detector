@@ -7,7 +7,7 @@ from .api.router import api_router
 
 app = FastAPI(title="Email Phishing Detector")
 
-BASE_DIR = Path(__file__).resolve.parent
+BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)

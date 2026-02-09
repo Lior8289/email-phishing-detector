@@ -119,7 +119,6 @@
         color: #fff;
         box-shadow: 0 2px 8px rgba(61, 90, 254, 0.25);
       }
-
       .btn-primary:hover {
         background: var(--accent-hover);
         box-shadow: 0 4px 14px rgba(61, 90, 254, 0.3);
@@ -130,7 +129,6 @@
         color: var(--text);
         border: 1.5px solid var(--border);
       }
-
       .btn-secondary:hover {
         background: #ebedf1;
       }
@@ -139,7 +137,6 @@
         display: flex;
         gap: 12px;
       }
-
       .row > div {
         flex: 1;
       }
@@ -158,13 +155,11 @@
         border: 1.5px solid var(--safe-border);
         color: var(--safe-text);
       }
-
       .sus {
         background: var(--sus-bg);
         border: 1.5px solid var(--sus-border);
         color: var(--sus-text);
       }
-
       .phish {
         background: var(--phish-bg);
         border: 1.5px solid var(--phish-border);
@@ -179,13 +174,11 @@
         margin: 8px 0 0 18px;
         padding: 0;
       }
-
       li {
         margin-bottom: 5px;
         line-height: 1.5;
         font-size: 13.5px;
       }
-
       li b {
         font-family: "JetBrains Mono", monospace;
         font-size: 12px;
@@ -310,7 +303,6 @@
         text-decoration: none;
         word-break: break-all;
       }
-
       a:hover {
         text-decoration: underline;
       }
@@ -353,13 +345,11 @@
           opacity: 0;
           transform: translateY(6px);
         }
-
         to {
           opacity: 1;
           transform: translateY(0);
         }
       }
-
       .fade-in {
         animation: fadeIn 0.3s ease-out;
       }
@@ -369,7 +359,6 @@
   <body>
     <div class="top">
       <h2>🛡️ Email Phishing Detector</h2>
-      <div class="pill">Mission 1 Demo</div>
     </div>
 
     <p class="subtitle">
@@ -398,7 +387,7 @@
 
         <div class="actions">
           <button id="scanBtn" class="btn-primary">⚡ Scan</button>
-          <button id="exampleBtn" class="btn-secondary">Load example</button>
+          <button id="exampleBtn" class="btn-secondary">Load examples</button>
           <span id="status"></span>
         </div>
       </div>
@@ -422,11 +411,45 @@
         return "badge phish";
       }
 
+      const examples = [
+        {
+          from: "newsletter@medium.com",
+          subject: "Your weekly reading recommendations",
+          body: "Hi there,\n\nHere are this week's top stories curated just for you based on your reading history.\n\n1. How to Build Better Habits in 2026\n2. The Future of Remote Work\n3. Understanding TypeScript Generics\n\nHappy reading!\n— The Medium Team\n\nUnsubscribe: https://medium.com/settings/notifications",
+        },
+        {
+          from: "shipping@amaz0n-orders.com",
+          subject: "Your order #839-2847 has shipped",
+          body: "Dear Customer,\n\nYour recent order has been shipped and is on its way!\n\nHowever, we noticed a problem with your payment method. Please update your billing information within 24 hours to avoid delivery delays.\n\nUpdate now: http://amaz0n-orders.com/billing-update\n\nThank you for shopping with us.",
+        },
+        {
+          from: "support@paypaI.com",
+          subject: "URGENT: verify your account",
+          body: "We detected suspicious activity. Verify immediately or your account will be suspended.\nClick: http://bit.ly/xyz",
+        },
+        {
+          from: "security-noreply@g00gle-accounts.net",
+          subject: "⚠️ CRITICAL: Someone has your password — Act NOW",
+          body: "ALERT: Your Google account was accessed from North Korea at 3:47 AM.\n\nIf this wasn't you, your account WILL BE PERMANENTLY DELETED in 2 hours.\n\nYou MUST verify your identity immediately:\nhttp://g00gle-accounts.net/verify?id=8x7k2m\n\nEnter your current password, SSN, and date of birth to confirm ownership.\n\nGoogle Security Team\nThis is an automated message. Do not reply.",
+        },
+        {
+          from: "prince.abubakar@royalfund-ng.com",
+          subject: "RE: CONFIDENTIAL — $24.5M USD Transfer To Your Account",
+          body: "DEAR BELOVED FRIEND,\n\nI am Prince Abubakar, son of the late King of a West African nation. I have $24,500,000 USD trapped in a foreign security vault and I need YOUR help to transfer it.\n\nYou will receive 30% ($7,350,000) for your assistance.\n\nAll I need from you:\n- Full name\n- Bank account number and routing number\n- Copy of passport or government ID\n- A small processing fee of $500 via Western Union\n\nThis is 100% RISK FREE and LEGAL. Reply urgently as time is running out!!!\n\nGod Bless,\nPrince Abubakar\nhttp://royalfund-ng.com/claim-funds",
+        },
+      ];
+
+      let lastIndex = -1;
       $("exampleBtn").onclick = () => {
-        $("from_addr").value = "support@paypaI.com";
-        $("subject").value = "URGENT: verify your account";
-        $("body").value =
-          "We detected suspicious activity. Verify immediately or your account will be suspended.\nClick: http://bit.ly/xyz";
+        let idx;
+        do {
+          idx = Math.floor(Math.random() * examples.length);
+        } while (idx === lastIndex && examples.length > 1);
+        lastIndex = idx;
+        const ex = examples[idx];
+        $("from_addr").value = ex.from;
+        $("subject").value = ex.subject;
+        $("body").value = ex.body;
       };
 
       $("scanBtn").onclick = async () => {

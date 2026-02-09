@@ -5,7 +5,7 @@ URL_RE = re.compile(r"(https?://[^\s<>\"]+)", re.IGNORECASE)
 
 URGENT_PATTERNS = [
     r"\burgent\b", r"\bimmediately\b", r"\bact now\b",
-    r"\bverify\b", r"\bsuspended\b", r"\bsecurity alert\b",
+    r"\bverify\b", r"\bsuspended\b", r"\bsecurity alert\b", 
 ]
 
 SHORTENERS = {"bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly", "is.gd"}

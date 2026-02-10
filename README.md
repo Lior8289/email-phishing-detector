@@ -136,5 +136,6 @@ The UI reads these params and can auto-scan on load.
 
 ## Notes / Limitations
 
-- Email bodies can be large; for Gmail deep-link the body is intentionally truncated to keep URLs safe.
+- Email bodies can be large, I've limited it for convienience.
+- for Gmail deep-link the body is intentionally truncated to keep URLs safe.
 - Render free instances may “sleep”; the first request may take a few seconds.

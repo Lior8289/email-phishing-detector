@@ -6,7 +6,9 @@
     "https://www.googleapis.com/auth/script.external_request",
     "https://www.googleapis.com/auth/script.locale"
   ],
-  "urlFetchWhitelist": ["https://email-phishing-detector-ws33.onrender.com/"],
+  "urlFetchWhitelist": [
+    "https://email-phishing-detector-ws33.onrender.com/"
+  ],
   "addOns": {
     "common": {
       "name": "Phishing Scanner",

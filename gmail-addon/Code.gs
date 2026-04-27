@@ -21,7 +21,7 @@ function createScanCard_(subtitle) {
   var section = CardService.newCardSection()
     .addWidget(
       CardService.newTextParagraph().setText(
-        "Analyzes the currently opened email for phishing signals using rules + ML."
+        "Analyzes the currently opened email for phishing signals using header authentication, rules engine, and ML."
       )
     )
     .addWidget(
@@ -41,16 +41,85 @@ function scanCurrentEmail(e) {
     if (!e || !e.gmail || !e.gmail.messageId) {
       return pushCard_(createErrorCard_("No email is open. Open an email and try again."));
     }
-
     var card = buildScanResultCard_(e);
     return pushCard_(card);
-
   } catch (err) {
     return pushCard_(createErrorCard_("Scan failed:\n" + String(err)));
   }
 }
 
-/* ───────── Build result card (returns Card, not ActionResponse) ───────── */
+/* ───────── Parse authentication headers from raw email ───────── */
+function parseAuthHeaders_(rawContent) {
+  var headers = {
+    spf: null,
+    dkim: null,
+    dmarc: null,
+    return_path: null,
+    received_count: 0
+  };
+
+  // Only look at the header portion (before first blank line)
+  var headerEnd = rawContent.indexOf("\r\n\r\n");
+  if (headerEnd < 0) headerEnd = rawContent.indexOf("\n\n");
+  var headerBlock = headerEnd > 0 ? rawContent.substring(0, headerEnd) : rawContent.substring(0, 8000);
+
+  // Count Received headers (each hop adds one)
+  var receivedMatches = headerBlock.match(/^Received:/gm);
+  headers.received_count = receivedMatches ? receivedMatches.length : 0;
+
+  // Return-Path
+  var rpMatch = headerBlock.match(/^Return-Path:\s*<?([^>\r\n]+)>?/mi);
+  if (rpMatch) {
+    headers.return_path = rpMatch[1].trim();
+  }
+
+  // Authentication-Results header (contains SPF, DKIM, DMARC results)
+  var authMatch = headerBlock.match(/^Authentication-Results:[\s\S]*?(?=^\S)/m);
+  var authLine = authMatch ? authMatch[0] : "";
+
+  // Also check Received-SPF header directly
+  var spfHeaderMatch = headerBlock.match(/^Received-SPF:\s*(\w+)/mi);
+
+  // SPF
+  var spfMatch = authLine.match(/spf=(\w+)/i);
+  if (spfMatch) {
+    headers.spf = spfMatch[1].toLowerCase();
+  } else if (spfHeaderMatch) {
+    headers.spf = spfHeaderMatch[1].toLowerCase();
+  }
+
+  // DKIM
+  var dkimMatch = authLine.match(/dkim=(\w+)/i);
+  if (dkimMatch) {
+    headers.dkim = dkimMatch[1].toLowerCase();
+  }
+
+  // DMARC
+  var dmarcMatch = authLine.match(/dmarc=(\w+)/i);
+  if (dmarcMatch) {
+    headers.dmarc = dmarcMatch[1].toLowerCase();
+  }
+
+  return headers;
+}
+
+/* ───────── Extract attachment metadata ───────── */
+function getAttachmentInfo_(msg) {
+  var attachments = msg.getAttachments();
+  if (!attachments || !attachments.length) return [];
+
+  var result = [];
+  for (var i = 0; i < attachments.length && i < 10; i++) {
+    result.push({
+      filename: attachments[i].getName() || "unknown",
+      mime_type: attachments[i].getContentType() || "",
+      size: attachments[i].getSize() || 0
+    });
+  }
+  return result;
+}
+
+/* ───────── Build result card ───────── */
 function buildScanResultCard_(e) {
   var accessToken = e.gmail.accessToken;
   var messageId = e.gmail.messageId;
@@ -62,13 +131,22 @@ function buildScanResultCard_(e) {
   var subject  = msg.getSubject() || "";
   var body     = (msg.getPlainBody() || "").slice(0, 15000);
 
+  // Parse raw headers for SPF/DKIM/DMARC
+  var rawContent = msg.getRawContent() || "";
+  var parsedHeaders = parseAuthHeaders_(rawContent);
+
+  // Get attachment metadata
+  var attachmentInfo = getAttachmentInfo_(msg);
+
   var payload = {
     from_addr: fromAddr,
     subject: subject,
-    body: body
+    body: body,
+    headers: parsedHeaders,
+    attachments: attachmentInfo.length > 0 ? attachmentInfo : null
   };
 
-  // Optional health ping (doesn't block functionality)
+  // Wake up backend if sleeping
   UrlFetchApp.fetch(API_BASE + "/health", { method: "get", muteHttpExceptions: true });
 
   var res = UrlFetchApp.fetch(API_BASE + SCAN_PATH, {
@@ -108,8 +186,16 @@ function createResultCard_(data, fromAddr, subject, body) {
   var mlPct      = (data.ml_probability == null) ? "N/A" : (Math.round(data.ml_probability * 100) + "%");
   var rulesScore = (data.rules_score == null) ? "N/A" : String(data.rules_score);
 
-  var isPhishing = (String(data.classification || "")).toLowerCase().indexOf("phish") >= 0;
-  var label = isPhishing ? "⚠️ PHISHING" : "✅ SAFE";
+  // Fixed: correctly handle all three verdicts
+  var cls = String(data.classification || "").toLowerCase();
+  var label;
+  if (cls.indexOf("phish") >= 0) {
+    label = "PHISHING";
+  } else if (cls.indexOf("suspicious") >= 0) {
+    label = "SUSPICIOUS";
+  } else {
+    label = "SAFE";
+  }
 
   var card = CardService.newCardBuilder()
     .setHeader(
@@ -123,14 +209,29 @@ function createResultCard_(data, fromAddr, subject, body) {
   scores.addWidget(CardService.newDecoratedText().setTopLabel("CONFIDENCE").setText(confPct + "%"));
   scores.addWidget(CardService.newDecoratedText().setTopLabel("ML PROBABILITY").setText(mlPct));
   scores.addWidget(CardService.newDecoratedText().setTopLabel("RULES SCORE").setText(rulesScore));
+
+  // Blocklist indicator
+  if (data.blocklist_hit) {
+    scores.addWidget(CardService.newDecoratedText().setTopLabel("BLOCKLIST").setText("SENDER IS BLOCKED"));
+  }
+
+  // Sender history
+  if (data.sender_history && data.sender_history.times_flagged > 0) {
+    scores.addWidget(
+      CardService.newDecoratedText()
+        .setTopLabel("SENDER HISTORY")
+        .setText("Flagged " + data.sender_history.times_flagged + " time(s) before")
+    );
+  }
+
   card.addSection(scores);
 
-  // --- Rule hits (deduplicated, max 3) ---
+  // --- Rule hits (deduplicated, max 5) ---
   if (data.rule_hits && data.rule_hits.length) {
     var why = CardService.newCardSection().setHeader("Why?");
     var seen = {};
     var count = 0;
-    for (var i = 0; i < data.rule_hits.length && count < 3; i++) {
+    for (var i = 0; i < data.rule_hits.length && count < 5; i++) {
       var msg = String(data.rule_hits[i].message || "");
       if (seen[msg]) continue;
       seen[msg] = true;
@@ -143,6 +244,28 @@ function createResultCard_(data, fromAddr, subject, body) {
       );
     }
     card.addSection(why);
+  }
+
+  // --- Enrichment results ---
+  if (data.enrichment) {
+    var enrichSection = CardService.newCardSection().setHeader("Domain Enrichment");
+    var mx = data.enrichment.mx;
+    if (mx) {
+      var mxText = mx.has_mx
+        ? "MX found: " + (mx.records || []).slice(0, 2).join(", ")
+        : "No MX records (cannot receive email)";
+      enrichSection.addWidget(
+        CardService.newDecoratedText().setTopLabel("MX RECORDS").setText(mxText).setWrapText(true)
+      );
+    }
+    if (data.enrichment.resolves !== null && data.enrichment.resolves !== undefined) {
+      enrichSection.addWidget(
+        CardService.newDecoratedText()
+          .setTopLabel("DNS")
+          .setText(data.enrichment.resolves ? "Domain resolves" : "Domain does NOT resolve")
+      );
+    }
+    card.addSection(enrichSection);
   }
 
   // --- Extracted links (deduplicated by domain, max 3) ---
@@ -162,9 +285,25 @@ function createResultCard_(data, fromAddr, subject, body) {
     card.addSection(linksSection);
   }
 
-  // --- "Go To Website" via stash token (full body, no truncation) ---
+  // --- Actions: Block Sender + Go To Website ---
   var actions = CardService.newCardSection();
 
+  // Block Sender button
+  if (fromAddr) {
+    var senderDomain = fromAddr.indexOf("@") >= 0 ? fromAddr.split("@").pop() : fromAddr;
+    actions.addWidget(
+      CardService.newTextButton()
+        .setText("Block Sender Domain")
+        .setTextButtonStyle(CardService.TextButtonStyle.TEXT)
+        .setOnClickAction(
+          CardService.newAction()
+            .setFunctionName("blockSender")
+            .setParameters({ domain: senderDomain })
+        )
+    );
+  }
+
+  // Go To Website via stash token
   var stashRes = UrlFetchApp.fetch(API_BASE + "/stash", {
     method: "post",
     contentType: "application/json",
@@ -184,13 +323,46 @@ function createResultCard_(data, fromAddr, subject, body) {
 
   actions.addWidget(
     CardService.newTextButton()
-      .setText("Go To Website")
+      .setText("Open in Web App")
       .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
       .setOpenLink(CardService.newOpenLink().setUrl(safeUrl))
   );
   card.addSection(actions);
 
   return card.build();
+}
+
+/* ───────── Block Sender handler ───────── */
+function blockSender(e) {
+  var domain = (e.parameters && e.parameters.domain) || "";
+  if (!domain) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText("No domain to block."))
+      .build();
+  }
+
+  try {
+    UrlFetchApp.fetch(API_BASE + "/blocklist", {
+      method: "post",
+      contentType: "application/json",
+      payload: JSON.stringify({
+        entry: domain,
+        entry_type: "domain",
+        reason: "Blocked from Gmail add-on"
+      }),
+      muteHttpExceptions: true
+    });
+
+    return CardService.newActionResponseBuilder()
+      .setNotification(
+        CardService.newNotification().setText("Blocked: " + domain)
+      )
+      .build();
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText("Failed to block: " + String(err)))
+      .build();
+  }
 }
 
 /* ───────── Error Card ───────── */
@@ -213,7 +385,8 @@ function escapeHtml_(s) {
   return String(s)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function truncateUrl_(url, max) {

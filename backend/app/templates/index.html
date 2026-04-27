@@ -30,9 +30,7 @@
       --shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: "DM Sans", system-ui, sans-serif;
@@ -54,321 +52,155 @@
     }
 
     label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--muted);
-      display: block;
-      margin: 14px 0 5px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--muted);
+      display: block; margin: 14px 0 5px;
     }
 
-    input,
-    textarea {
-      width: 100%;
-      padding: 11px 14px;
-      border-radius: 10px;
-      border: 1.5px solid var(--border);
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--text);
-      background: var(--bg);
-      transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
+    input, textarea {
+      width: 100%; padding: 11px 14px; border-radius: 10px;
+      border: 1.5px solid var(--border); font-size: 14px;
+      font-family: inherit; color: var(--text); background: var(--bg);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
       outline: none;
     }
 
-    input:focus,
-    textarea:focus {
+    input:focus, textarea:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(61, 90, 254, 0.12);
     }
 
-    input::placeholder,
-    textarea::placeholder {
-      color: #adb3be;
-    }
+    input::placeholder, textarea::placeholder { color: #adb3be; }
 
-    textarea {
-      min-height: 180px;
-      resize: vertical;
-      line-height: 1.55;
-    }
+    textarea { min-height: 180px; resize: vertical; line-height: 1.55; }
 
     button {
-      padding: 11px 20px;
-      border-radius: 10px;
-      border: 0;
-      cursor: pointer;
-      font-weight: 600;
-      font-family: inherit;
-      font-size: 14px;
-      transition:
-        background 0.15s ease,
-        transform 0.1s ease,
-        box-shadow 0.15s ease;
+      padding: 11px 20px; border-radius: 10px; border: 0;
+      cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px;
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
     }
-
-    button:active {
-      transform: scale(0.97);
-    }
+    button:active { transform: scale(0.97); }
 
     .btn-primary {
-      background: var(--accent);
-      color: #fff;
+      background: var(--accent); color: #fff;
       box-shadow: 0 2px 8px rgba(61, 90, 254, 0.25);
     }
-
     .btn-primary:hover {
       background: var(--accent-hover);
       box-shadow: 0 4px 14px rgba(61, 90, 254, 0.3);
     }
 
     .btn-secondary {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       border: 1.5px solid var(--border);
     }
+    .btn-secondary:hover { background: #ebedf1; }
 
-    .btn-secondary:hover {
-      background: #ebedf1;
+    .btn-danger {
+      background: var(--phish-bg); color: var(--phish-text);
+      border: 1.5px solid var(--phish-border);
     }
+    .btn-danger:hover { background: #ffe0e0; }
 
-    .row {
-      display: flex;
-      gap: 12px;
-    }
-
-    .row>div {
-      flex: 1;
-    }
+    .row { display: flex; gap: 12px; }
+    .row > div { flex: 1; }
 
     .badge {
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 0.02em;
+      display: inline-block; padding: 6px 14px; border-radius: 999px;
+      font-weight: 700; font-size: 13px; letter-spacing: 0.02em;
     }
+    .safe { background: var(--safe-bg); border: 1.5px solid var(--safe-border); color: var(--safe-text); }
+    .sus { background: var(--sus-bg); border: 1.5px solid var(--sus-border); color: var(--sus-text); }
+    .phish { background: var(--phish-bg); border: 1.5px solid var(--phish-border); color: var(--phish-text); }
 
-    .safe {
-      background: var(--safe-bg);
-      border: 1.5px solid var(--safe-border);
-      color: var(--safe-text);
-    }
+    .muted { color: var(--muted); }
 
-    .sus {
-      background: var(--sus-bg);
-      border: 1.5px solid var(--sus-border);
-      color: var(--sus-text);
-    }
+    ul { margin: 8px 0 0 18px; padding: 0; }
+    li { margin-bottom: 5px; line-height: 1.5; font-size: 13.5px; }
+    li b { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--accent); }
 
-    .phish {
-      background: var(--phish-bg);
-      border: 1.5px solid var(--phish-border);
-      color: var(--phish-text);
-    }
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+    .top h2 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
 
-    .muted {
-      color: var(--muted);
-    }
+    .subtitle { color: var(--muted); font-size: 14px; margin: 0 0 20px; line-height: 1.5; }
 
-    ul {
-      margin: 8px 0 0 18px;
-      padding: 0;
-    }
-
-    li {
-      margin-bottom: 5px;
-      line-height: 1.5;
-      font-size: 13.5px;
-    }
-
-    li b {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 12px;
-      color: var(--accent);
-    }
-
-    .top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
-
-    .top h2 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .pill {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 5px 12px;
-      border: 1.5px solid var(--border);
-      border-radius: 999px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 14px;
-      margin: 0 0 20px;
-      line-height: 1.5;
-    }
-
-    .grid {
-      display: grid;
-      gap: 16px;
-      grid-template-columns: 1fr;
-    }
-
-    @media (min-width: 860px) {
-      .grid {
-        grid-template-columns: 1.1fr 0.9fr;
-      }
-    }
+    .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+    @media (min-width: 860px) { .grid { grid-template-columns: 1.1fr 0.9fr; } }
 
     .result-heading {
-      margin: 0 0 16px;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin: 0 0 16px; font-size: 15px; font-weight: 700; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
     }
-
     .result-heading::before {
-      content: "";
-      width: 4px;
-      height: 18px;
-      background: var(--accent);
-      border-radius: 4px;
-      display: inline-block;
+      content: ""; width: 4px; height: 18px; background: var(--accent);
+      border-radius: 4px; display: inline-block;
     }
 
     .result-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 120px;
-      color: var(--muted);
-      font-size: 13.5px;
-      border: 2px dashed var(--border);
-      border-radius: 10px;
-      text-align: center;
-      padding: 20px;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 120px; color: var(--muted); font-size: 13.5px;
+      border: 2px dashed var(--border); border-radius: 10px;
+      text-align: center; padding: 20px;
     }
 
-    .stat-row {
-      display: flex;
-      gap: 16px;
-      margin-top: 12px;
-    }
+    .stat-row { display: flex; gap: 16px; margin-top: 12px; }
+    .stat { background: var(--bg); border-radius: 10px; padding: 10px 14px; flex: 1; text-align: center; }
+    .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+    .stat-value { font-size: 20px; font-weight: 700; color: var(--text); margin-top: 2px; font-family: "JetBrains Mono", monospace; }
 
-    .stat {
-      background: var(--bg);
-      border-radius: 10px;
-      padding: 10px 14px;
-      flex: 1;
-      text-align: center;
-    }
+    h4 { font-size: 13px; font-weight: 700; margin: 16px 0 8px; color: var(--text); }
 
-    .stat-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      font-weight: 600;
-    }
+    a { color: var(--accent); text-decoration: none; word-break: break-all; }
+    a:hover { text-decoration: underline; }
 
-    .stat-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      margin-top: 2px;
-      font-family: "JetBrains Mono", monospace;
-    }
+    .actions { display: flex; gap: 10px; margin-top: 16px; align-items: center; }
+    #status { font-size: 13px; color: var(--muted); }
 
-    h4 {
-      font-size: 13px;
-      font-weight: 700;
-      margin: 16px 0 8px;
-      color: var(--text);
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none;
-      word-break: break-all;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-      align-items: center;
-    }
-
-    #status {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    /* Spinner */
     .scanning #status::after {
-      content: "";
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      margin-left: 8px;
-      vertical-align: middle;
+      content: ""; display: inline-block; width: 12px; height: 12px;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 0.6s linear infinite;
+      margin-left: 8px; vertical-align: middle;
     }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
 
-    /* Fade in result */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .tabs { display: flex; gap: 0; margin-top: 24px; }
+    .tab {
+      padding: 10px 20px; font-size: 13px; font-weight: 600;
+      border: 1.5px solid var(--border); background: var(--bg);
+      cursor: pointer; color: var(--muted); transition: all 0.15s ease;
     }
+    .tab:first-child { border-radius: 10px 0 0 10px; }
+    .tab:last-child { border-radius: 0 10px 10px 0; }
+    .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-    .fade-in {
-      animation: fadeIn 0.3s ease-out;
+    .history-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+    .history-table th { text-align: left; padding: 8px 10px; font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--muted); border-bottom: 2px solid var(--border); }
+    .history-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    .history-table tr:hover td { background: var(--bg); }
+
+    .enrichment-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 0; font-size: 13px;
     }
+    .enrichment-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-green { background: var(--safe-text); }
+    .dot-red { background: var(--phish-text); }
+    .dot-yellow { background: var(--sus-text); }
   </style>
 </head>
 
 <body>
   <div class="top">
-    <h2>🛡️ Email Phishing Detector</h2>
+    <h2>Email Phishing Detector</h2>
   </div>
 
   <p class="subtitle">
@@ -376,41 +208,88 @@
     classification, confidence, and reasons.
   </p>
 
-  <div class="grid">
-    <div class="card">
-      <div class="row">
-        <div>
-          <label>From</label>
-          <input id="from_addr" placeholder="support@company.com" />
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('scanner')">Scanner</div>
+    <div class="tab" onclick="switchTab('history')">History</div>
+    <div class="tab" onclick="switchTab('blocklist')">Blocklist</div>
+  </div>
+
+  <!-- Scanner Tab -->
+  <div id="tab-scanner" class="tab-content active" style="margin-top:16px;">
+    <div class="grid">
+      <div class="card">
+        <div class="row">
+          <div>
+            <label>From</label>
+            <input id="from_addr" placeholder="support@company.com" />
+          </div>
+          <div>
+            <label>Subject</label>
+            <input id="subject" placeholder="Security Alert: Action Required" />
+          </div>
         </div>
-        <div>
-          <label>Subject</label>
-          <input id="subject" placeholder="Security Alert: Action Required" />
+
+        <label>Email Body</label>
+        <textarea id="body" placeholder="Paste the email body here..."></textarea>
+
+        <div class="actions">
+          <button id="scanBtn" class="btn-primary">Scan</button>
+          <button id="exampleBtn" class="btn-secondary">Load example</button>
+          <span id="status"></span>
         </div>
       </div>
 
-      <label>Email Body</label>
-      <textarea id="body" placeholder="Paste the email body here..."></textarea>
-
-      <div class="actions">
-        <button id="scanBtn" class="btn-primary">⚡ Scan</button>
-        <button id="exampleBtn" class="btn-secondary">Load examples</button>
-        <span id="status"></span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="result-heading">Result</div>
-      <div id="result">
-        <div class="result-placeholder">
-          No scan yet — paste an email to get started.
+      <div class="card">
+        <div class="result-heading">Result</div>
+        <div id="result">
+          <div class="result-placeholder">
+            No scan yet — paste an email to get started.
+          </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- History Tab -->
+  <div id="tab-history" class="tab-content" style="margin-top:16px;">
+    <div class="card">
+      <div class="result-heading">Scan History</div>
+      <div id="history-stats" style="margin-bottom:16px;"></div>
+      <div id="history-list">
+        <div class="result-placeholder">Loading history...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blocklist Tab -->
+  <div id="tab-blocklist" class="tab-content" style="margin-top:16px;">
+    <div class="card">
+      <div class="result-heading">Personal Blocklist</div>
+      <p class="muted" style="font-size:13px; margin:0 0 14px;">
+        Blocked domains or emails will automatically be flagged as suspicious.
+      </p>
+      <div class="row" style="align-items:flex-end;">
+        <div>
+          <label>Domain or Email</label>
+          <input id="block-entry" placeholder="suspicious-domain.com" />
+        </div>
+        <div style="flex:0 0 auto; padding-bottom:1px;">
+          <button class="btn-danger" onclick="addToBlocklist()">Block</button>
+        </div>
+      </div>
+      <div id="blocklist-items" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
   <script>
     const $ = (id) => document.getElementById(id);
+
+    /* Safe text escaping — all dynamic content goes through this */
+    function esc(s) {
+      const d = document.createElement("div");
+      d.textContent = String(s);
+      return d.innerHTML;
+    }
 
     function badgeClass(label) {
       if (label === "Safe") return "badge safe";
@@ -418,16 +297,157 @@
       return "badge phish";
     }
 
+    /* Build result DOM using safe DOM APIs instead of raw HTML for
+       user-controlled content. Static structure uses template strings
+       with all dynamic values escaped via esc(). */
+    function renderResult(data) {
+      const container = document.createElement("div");
+      container.className = "fade-in";
+
+      const confPct = Math.round((data.confidence || 0) * 100);
+      const mlPct = data.ml_probability == null ? "N/A" : Math.round(data.ml_probability * 100) + "%";
+
+      // Verdict + stats (static structure, escaped values)
+      const header = document.createElement("div");
+      header.style.cssText = "display:flex; align-items:center; gap:10px;";
+      const badge = document.createElement("span");
+      badge.className = badgeClass(data.classification);
+      badge.textContent = data.classification;
+      header.appendChild(badge);
+      if (data.blocklist_hit) {
+        const blBadge = document.createElement("span");
+        blBadge.className = "badge phish";
+        blBadge.style.cssText = "font-size:11px;";
+        blBadge.textContent = "BLOCKLISTED";
+        header.appendChild(blBadge);
+      }
+      container.appendChild(header);
+
+      // Stats row
+      const statsDiv = document.createElement("div");
+      statsDiv.className = "stat-row";
+      for (const [lbl, val] of [["Confidence", confPct + "%"], ["ML Prob", mlPct], ["Rules", String(data.rules_score)]]) {
+        const stat = document.createElement("div");
+        stat.className = "stat";
+        const sl = document.createElement("div");
+        sl.className = "stat-label";
+        sl.textContent = lbl;
+        const sv = document.createElement("div");
+        sv.className = "stat-value";
+        sv.textContent = val;
+        stat.appendChild(sl);
+        stat.appendChild(sv);
+      }
+      container.appendChild(statsDiv);
+
+      // Sender history
+      if (data.sender_history && data.sender_history.times_flagged > 0) {
+        const histDiv = document.createElement("div");
+        histDiv.style.cssText = "margin-top:12px; padding:8px 12px; background:var(--sus-bg); border:1px solid var(--sus-border); border-radius:8px; font-size:13px; color:var(--sus-text);";
+        histDiv.textContent = "This sender was flagged " + data.sender_history.times_flagged + " time(s) before.";
+        container.appendChild(histDiv);
+      }
+
+      // Rule hits
+      if (data.rule_hits && data.rule_hits.length) {
+        const h4 = document.createElement("h4");
+        h4.textContent = "Why?";
+        container.appendChild(h4);
+        const ul = document.createElement("ul");
+        for (const h of data.rule_hits.slice(0, 10)) {
+          const li = document.createElement("li");
+          const b = document.createElement("b");
+          b.textContent = h.id;
+          li.appendChild(b);
+          li.appendChild(document.createTextNode(" "));
+          const sev = document.createElement("span");
+          sev.className = "muted";
+          sev.textContent = "(sev " + h.severity + ")";
+          li.appendChild(sev);
+          li.appendChild(document.createTextNode(" \u2014 " + h.message));
+          ul.appendChild(li);
+        }
+        container.appendChild(ul);
+      } else {
+        const noRules = document.createElement("div");
+        noRules.className = "muted";
+        noRules.style.cssText = "margin-top:14px; font-size:13px;";
+        noRules.textContent = "No rules triggered.";
+        container.appendChild(noRules);
+      }
+
+      // Enrichment
+      if (data.enrichment) {
+        const h4e = document.createElement("h4");
+        h4e.textContent = "Domain Enrichment";
+        container.appendChild(h4e);
+        const e = data.enrichment;
+        if (e.mx) {
+          const item = document.createElement("div");
+          item.className = "enrichment-item";
+          const dot = document.createElement("span");
+          dot.className = "enrichment-dot " + (e.mx.has_mx ? "dot-green" : "dot-red");
+          item.appendChild(dot);
+          const txt = document.createTextNode(
+            e.mx.has_mx
+              ? "MX records found: " + (e.mx.records || []).slice(0, 2).join(", ")
+              : "No MX records \u2014 domain cannot receive email"
+          );
+          item.appendChild(txt);
+          container.appendChild(item);
+        }
+        if (e.resolves !== null && e.resolves !== undefined) {
+          const item2 = document.createElement("div");
+          item2.className = "enrichment-item";
+          const dot2 = document.createElement("span");
+          dot2.className = "enrichment-dot " + (e.resolves ? "dot-green" : "dot-red");
+          item2.appendChild(dot2);
+          item2.appendChild(document.createTextNode(e.resolves ? "Domain resolves to an IP" : "Domain does NOT resolve"));
+          container.appendChild(item2);
+        }
+      }
+
+      // Extracted links (text only, no clickable hrefs for safety)
+      if (data.extracted_links && data.extracted_links.length) {
+        const h4l = document.createElement("h4");
+        h4l.textContent = "Extracted links";
+        container.appendChild(h4l);
+        const ull = document.createElement("ul");
+        for (const link of data.extracted_links.slice(0, 8)) {
+          if (!/^https?:\/\//i.test(link)) continue;
+          const li = document.createElement("li");
+          li.textContent = link;
+          ull.appendChild(li);
+        }
+        container.appendChild(ull);
+      }
+
+      return container;
+    }
+
+    // ── Tabs ──
+    function switchTab(name) {
+      document.querySelectorAll(".tab").forEach((t, i) => {
+        const tabs = ["scanner", "history", "blocklist"];
+        t.classList.toggle("active", tabs[i] === name);
+      });
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      $("tab-" + name).classList.add("active");
+      if (name === "history") loadHistory();
+      if (name === "blocklist") loadBlocklist();
+    }
+
+    // ── Examples ──
     const examples = [
       {
         from: "notifications@upwind.comeet-notifications.com",
         subject: "Upwind - next step",
-        body: "Hi Lior,\n\nIt was a pleasure talking to you earlier regarding the QA Engineer position.\n\nFollowing our conversation, we would like to invite you to the next stage – a home assignment (file attached).\n\nPlease send your completed assignment to dan.yahav@upwind.io.\n\nYou can also use this email address for any questions that may arise.\n\nUpon receiving your submission, the next stage will be a 60-minute technical interview with Dan Yahav (Senior Vice President, Platforms) and Gal Amato (Release Operations Team Lead), which will take place in our office.\n\nThe interview will include a presentation where you will have the opportunity to showcase your skills and expertise based on the home assignment.\n\nPlease schedule the date for the next interview as soon as you receive this email by selecting a time for your interview.",
+        body: "Hi Lior,\n\nIt was a pleasure talking to you earlier regarding the QA Engineer position.\n\nFollowing our conversation, we would like to invite you to the next stage \u2013 a home assignment (file attached).\n\nPlease send your completed assignment to dan.yahav@upwind.io.\n\nYou can also use this email address for any questions that may arise.\n\nUpon receiving your submission, the next stage will be a 60-minute technical interview.\n\nPlease schedule the date for the next interview as soon as you receive this email by selecting a time for your interview.",
       },
       {
         from: "newsletter@medium.com",
         subject: "Your weekly reading recommendations",
-        body: "Hi there,\n\nHere are this week's top stories curated just for you based on your reading history.\n\n1. How to Build Better Habits in 2026\n2. The Future of Remote Work\n3. Understanding TypeScript Generics\n\nHappy reading!\n— The Medium Team\n\nUnsubscribe: https://medium.com/settings/notifications",
+        body: "Hi there,\n\nHere are this week\u2019s top stories curated just for you based on your reading history.\n\n1. How to Build Better Habits in 2026\n2. The Future of Remote Work\n3. Understanding TypeScript Generics\n\nHappy reading!\n\u2014 The Medium Team\n\nUnsubscribe: https://medium.com/settings/notifications",
       },
       {
         from: "shipping@amaz0n-orders.com",
@@ -441,12 +461,12 @@
       },
       {
         from: "security-noreply@g00gle-accounts.net",
-        subject: "⚠️ CRITICAL: Someone has your password — Act NOW",
-        body: "ALERT: Your Google account was accessed from North Korea at 3:47 AM.\n\nIf this wasn't you, your account WILL BE PERMANENTLY DELETED in 2 hours.\n\nYou MUST verify your identity immediately:\nhttp://g00gle-accounts.net/verify?id=8x7k2m\n\nEnter your current password, SSN, and date of birth to confirm ownership.\n\nGoogle Security Team\nThis is an automated message. Do not reply.",
+        subject: "CRITICAL: Someone has your password \u2014 Act NOW",
+        body: "ALERT: Your Google account was accessed from North Korea at 3:47 AM.\n\nIf this wasn\u2019t you, your account WILL BE PERMANENTLY DELETED in 2 hours.\n\nYou MUST verify your identity immediately:\nhttp://g00gle-accounts.net/verify?id=8x7k2m\n\nEnter your current password, SSN, and date of birth to confirm ownership.\n\nGoogle Security Team\nThis is an automated message. Do not reply.",
       },
       {
         from: "prince.abubakar@royalfund-ng.com",
-        subject: "RE: CONFIDENTIAL — $24.5M USD Transfer To Your Account",
+        subject: "RE: CONFIDENTIAL \u2014 $24.5M USD Transfer To Your Account",
         body: "DEAR BELOVED FRIEND,\n\nI am Prince Abubakar, son of the late King of a West African nation. I have $24,500,000 USD trapped in a foreign security vault and I need YOUR help to transfer it.\n\nYou will receive 30% ($7,350,000) for your assistance.\n\nAll I need from you:\n- Full name\n- Bank account number and routing number\n- Copy of passport or government ID\n- A small processing fee of $500 via Western Union\n\nThis is 100% RISK FREE and LEGAL. Reply urgently as time is running out!!!\n\nGod Bless,\nPrince Abubakar\nhttp://royalfund-ng.com/claim-funds",
       },
     ];
@@ -454,18 +474,16 @@
     let lastIndex = -1;
     $("exampleBtn").onclick = () => {
       let idx;
-      do {
-        idx = Math.floor(Math.random() * examples.length);
-      } while (idx === lastIndex && examples.length > 1);
+      do { idx = Math.floor(Math.random() * examples.length); }
+      while (idx === lastIndex && examples.length > 1);
       lastIndex = idx;
-
       const ex = examples[idx];
       $("from_addr").value = ex.from;
       $("subject").value = ex.subject;
       $("body").value = ex.body;
     };
 
-    // --- Query helpers ---
+    // ── Query helpers ──
     function getParam(name) {
       return new URL(window.location.href).searchParams.get(name);
     }
@@ -474,7 +492,7 @@
       const token = getParam("token");
       if (token) {
         try {
-          const res = await fetch("/prefill/" + token);
+          const res = await fetch("/prefill/" + encodeURIComponent(token));
           if (res.ok) {
             const data = await res.json();
             if (data.from_addr) $("from_addr").value = data.from_addr;
@@ -482,12 +500,8 @@
             if (data.body) $("body").value = data.body;
             return { hasAny: true };
           }
-        } catch (e) {
-          console.warn("Prefill failed:", e);
-        }
+        } catch (e) { console.warn("Prefill failed:", e); }
       }
-
-      // Fallback to old query-param method
       const fromQ = getParam("from");
       const subjectQ = getParam("subject");
       const bodyQ = getParam("body");
@@ -498,11 +512,11 @@
       return { hasAny };
     }
 
-    // --- Core scan function (manual + auto) ---
+    // ── Core scan ──
     async function doScan() {
-      $("status").textContent = "Scanning…";
+      $("status").textContent = "Scanning\u2026";
       document.body.classList.add("scanning");
-      $("result").innerHTML = "";
+      $("result").textContent = "";
 
       const payload = {
         from_addr: $("from_addr").value || "",
@@ -516,80 +530,188 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
 
-        const confPct = Math.round((data.confidence || 0) * 100);
-        const mlPct =
-          data.ml_probability == null
-            ? "N/A"
-            : Math.round(data.ml_probability * 100) + "%";
-
-        let html = `<div class="fade-in">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span class="${badgeClass(data.classification)}">${data.classification}</span>
-        </div>
-
-        <div class="stat-row">
-          <div class="stat">
-            <div class="stat-label">Confidence</div>
-            <div class="stat-value">${confPct}%</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">ML Prob</div>
-            <div class="stat-value">${mlPct}</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">Rules</div>
-            <div class="stat-value">${data.rules_score}</div>
-          </div>
-        </div>`;
-
-        if (data.rule_hits && data.rule_hits.length) {
-          html += `<h4>Why?</h4><ul>`;
-          for (const h of data.rule_hits.slice(0, 8)) {
-            html += `<li><b>${h.id}</b> <span class="muted">(sev ${h.severity})</span> — ${h.message}</li>`;
-          }
-          html += `</ul>`;
-        } else {
-          html += `<div class="muted" style="margin-top:14px; font-size:13px;">No rules triggered.</div>`;
-        }
-
-        if (data.extracted_links && data.extracted_links.length) {
-          html += `<h4>Extracted links</h4><ul>`;
-          for (const link of data.extracted_links.slice(0, 8)) {
-            const safe = String(link)
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;");
-            html += `<li><a href="${safe}" target="_blank" rel="noreferrer">${safe}</a></li>`;
-          }
-          html += `</ul>`;
-        }
-
-        html += `</div>`;
-        $("result").innerHTML = html;
-        $("status").textContent = "Done ✓";
+        const resultEl = $("result");
+        resultEl.textContent = "";
+        resultEl.appendChild(renderResult(data));
+        $("status").textContent = "Done";
       } catch (e) {
-        $("result").innerHTML =
-          `<div class="fade-in" style="color:var(--phish-text); background:var(--phish-bg); padding:14px; border-radius:10px;">
-          <b>Error:</b> ${String(e.message).slice(0, 350)}
-        </div>`;
+        const errDiv = document.createElement("div");
+        errDiv.className = "fade-in";
+        errDiv.style.cssText = "color:var(--phish-text); background:var(--phish-bg); padding:14px; border-radius:10px;";
+        const b = document.createElement("b");
+        b.textContent = "Error: ";
+        errDiv.appendChild(b);
+        errDiv.appendChild(document.createTextNode(String(e.message).slice(0, 350)));
+        $("result").textContent = "";
+        $("result").appendChild(errDiv);
         $("status").textContent = "";
       } finally {
         document.body.classList.remove("scanning");
       }
     }
 
-    // Manual scan button
     $("scanBtn").onclick = doScan;
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const { hasAny } = prefillFromQuery();
+    // ── History (uses safe DOM construction) ──
+    async function loadHistory() {
+      try {
+        const [histRes, statsRes] = await Promise.all([
+          fetch("/history?limit=20"),
+          fetch("/history/stats"),
+        ]);
+        const items = await histRes.json();
+        const stats = await statsRes.json();
 
+        // Stats
+        const statsContainer = $("history-stats");
+        statsContainer.textContent = "";
+        const statsRow = document.createElement("div");
+        statsRow.className = "stat-row";
+        for (const [lbl, val, color] of [
+          ["Total", stats.total_scans, ""],
+          ["Phishing", stats.phishing, "var(--phish-text)"],
+          ["Suspicious", stats.suspicious, "var(--sus-text)"],
+          ["Safe", stats.safe, "var(--safe-text)"],
+        ]) {
+          const stat = document.createElement("div");
+          stat.className = "stat";
+          const sl = document.createElement("div");
+          sl.className = "stat-label";
+          sl.textContent = lbl;
+          const sv = document.createElement("div");
+          sv.className = "stat-value";
+          if (color) sv.style.color = color;
+          sv.textContent = String(val);
+          stat.appendChild(sl);
+          stat.appendChild(sv);
+          statsRow.appendChild(stat);
+        }
+        statsContainer.appendChild(statsRow);
+
+        // Table
+        const listContainer = $("history-list");
+        listContainer.textContent = "";
+        if (!items.length) {
+          const p = document.createElement("div");
+          p.className = "result-placeholder";
+          p.textContent = "No scans yet.";
+          listContainer.appendChild(p);
+          return;
+        }
+
+        const table = document.createElement("table");
+        table.className = "history-table";
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        for (const col of ["Time", "From", "Subject", "Verdict", "Conf"]) {
+          const th = document.createElement("th");
+          th.textContent = col;
+          headerRow.appendChild(th);
+        }
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        for (const h of items) {
+          const tr = document.createElement("tr");
+          const tdTime = document.createElement("td");
+          tdTime.style.whiteSpace = "nowrap";
+          tdTime.textContent = h.scanned_at || "";
+          const tdFrom = document.createElement("td");
+          tdFrom.textContent = (h.from_addr || "").slice(0, 30);
+          const tdSubj = document.createElement("td");
+          tdSubj.textContent = (h.subject || "").slice(0, 40);
+          const tdVerdict = document.createElement("td");
+          const vBadge = document.createElement("span");
+          vBadge.className = badgeClass(h.classification);
+          vBadge.style.cssText = "font-size:11px; padding:3px 10px;";
+          vBadge.textContent = h.classification;
+          tdVerdict.appendChild(vBadge);
+          const tdConf = document.createElement("td");
+          tdConf.textContent = Math.round((h.confidence || 0) * 100) + "%";
+          tr.appendChild(tdTime);
+          tr.appendChild(tdFrom);
+          tr.appendChild(tdSubj);
+          tr.appendChild(tdVerdict);
+          tr.appendChild(tdConf);
+          tbody.appendChild(tr);
+        }
+        table.appendChild(tbody);
+        listContainer.appendChild(table);
+      } catch (e) {
+        $("history-list").textContent = "Failed to load history.";
+      }
+    }
+
+    // ── Blocklist (uses safe DOM construction) ──
+    async function loadBlocklist() {
+      try {
+        const res = await fetch("/blocklist");
+        const items = await res.json();
+        const container = $("blocklist-items");
+        container.textContent = "";
+        if (!items.length) {
+          const p = document.createElement("div");
+          p.className = "muted";
+          p.style.fontSize = "13px";
+          p.textContent = "No blocked entries yet.";
+          container.appendChild(p);
+          return;
+        }
+        const ul = document.createElement("ul");
+        ul.style.cssText = "list-style:none; margin:0; padding:0;";
+        for (const item of items) {
+          const li = document.createElement("li");
+          li.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);";
+          const span = document.createElement("span");
+          const b = document.createElement("b");
+          b.textContent = item.entry;
+          span.appendChild(b);
+          const type = document.createElement("span");
+          type.className = "muted";
+          type.textContent = " (" + item.entry_type + ")";
+          span.appendChild(type);
+          li.appendChild(span);
+          const btn = document.createElement("button");
+          btn.className = "btn-secondary";
+          btn.style.cssText = "padding:5px 12px; font-size:12px;";
+          btn.textContent = "Remove";
+          btn.addEventListener("click", () => removeBlock(item.id));
+          li.appendChild(btn);
+          ul.appendChild(li);
+        }
+        container.appendChild(ul);
+      } catch (e) {
+        $("blocklist-items").textContent = "Failed to load blocklist.";
+      }
+    }
+
+    async function addToBlocklist() {
+      const entry = $("block-entry").value.trim();
+      if (!entry) return;
+      const entryType = entry.includes("@") ? "email" : "domain";
+      await fetch("/blocklist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entry: entry, entry_type: entryType }),
+      });
+      $("block-entry").value = "";
+      loadBlocklist();
+    }
+
+    async function removeBlock(id) {
+      await fetch("/blocklist/" + id, { method: "DELETE" });
+      loadBlocklist();
+    }
+
+    // ── Init ──
+    window.addEventListener("DOMContentLoaded", async () => {
+      const { hasAny } = await prefillFromQuery();
       if (hasAny) {
         doScan();
-        // clean the URL after reading params (hides long body)
         history.replaceState({}, "", "/");
       }
     });

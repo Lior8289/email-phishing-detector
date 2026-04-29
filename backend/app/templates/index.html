@@ -34,7 +34,7 @@
 
     body {
       font-family: "DM Sans", system-ui, sans-serif;
-      max-width: 940px;
+      max-width: 980px;
       margin: 0 auto;
       padding: 40px 20px 60px;
       background: var(--bg);
@@ -115,7 +115,7 @@
 
     .muted { color: var(--muted); }
 
-    ul { margin: 8px 0 0 18px; padding: 0; }
+    ul { margin: 8px 0 0 18px; padding: 0; overflow-wrap: anywhere; }
     li { margin-bottom: 5px; line-height: 1.5; font-size: 13.5px; }
     li b { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--accent); }
 
@@ -126,6 +126,7 @@
 
     .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
     @media (min-width: 860px) { .grid { grid-template-columns: 1.1fr 0.9fr; } }
+    .grid > .card { min-width: 0; overflow: hidden; }
 
     .result-heading {
       margin: 0 0 16px; font-size: 15px; font-weight: 700; color: var(--text);
@@ -152,6 +153,52 @@
 
     a { color: var(--accent); text-decoration: none; word-break: break-all; }
     a:hover { text-decoration: underline; }
+
+    .link-text { word-break: break-all; overflow-wrap: anywhere; font-size: 13px; }
+
+    /* Confidence gauge */
+    .confidence-gauge {
+      display: flex; align-items: center; gap: 16px; margin: 16px 0 8px;
+    }
+    .gauge-ring {
+      position: relative; width: 72px; height: 72px; flex-shrink: 0;
+    }
+    .gauge-ring svg { transform: rotate(-90deg); }
+    .gauge-ring .gauge-label {
+      position: absolute; inset: 0; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; font-weight: 700;
+      font-family: "JetBrains Mono", monospace;
+    }
+    .gauge-breakdown {
+      display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0;
+    }
+    .gauge-bar-row {
+      display: flex; align-items: center; gap: 8px; font-size: 12px;
+    }
+    .gauge-bar-label {
+      width: 70px; flex-shrink: 0; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.03em; font-size: 10px;
+    }
+    .gauge-bar-track {
+      flex: 1; height: 8px; background: var(--border); border-radius: 4px;
+      overflow: hidden; min-width: 0;
+    }
+    .gauge-bar-fill {
+      height: 100%; border-radius: 4px; transition: width 0.5s ease;
+    }
+    .gauge-bar-value {
+      width: 36px; flex-shrink: 0; text-align: right; font-weight: 600;
+      font-family: "JetBrains Mono", monospace; font-size: 12px;
+    }
+
+    .rule-tag {
+      display: inline-block; padding: 1px 6px; border-radius: 4px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+      margin-right: 4px; vertical-align: middle;
+    }
+    .rule-tag-rule { background: #ede9fe; color: #6d28d9; }
+    .rule-tag-enrichment { background: #e0f2fe; color: #0369a1; }
+    .rule-tag-blocklist { background: var(--phish-bg); color: var(--phish-text); }
 
     .actions { display: flex; gap: 10px; margin-top: 16px; align-items: center; }
     #status { font-size: 13px; color: var(--muted); }
@@ -297,17 +344,37 @@
       return "badge phish";
     }
 
-    /* Build result DOM using safe DOM APIs instead of raw HTML for
-       user-controlled content. Static structure uses template strings
-       with all dynamic values escaped via esc(). */
+    /* Build result DOM using safe DOM APIs — no innerHTML. */
+
+    function gaugeColor(classification) {
+      if (classification === "Safe") return "var(--safe-text)";
+      if (classification === "Suspicious") return "var(--sus-text)";
+      return "var(--phish-text)";
+    }
+
+    function ruleTagType(ruleId) {
+      if (ruleId === "blocklist_hit") return "blocklist";
+      if (["no_mx_record", "domain_unresolvable"].includes(ruleId)) return "enrichment";
+      return "rule";
+    }
+
+    function createSvgEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
     function renderResult(data) {
       const container = document.createElement("div");
       container.className = "fade-in";
 
       const confPct = Math.round((data.confidence || 0) * 100);
-      const mlPct = data.ml_probability == null ? "N/A" : Math.round(data.ml_probability * 100) + "%";
+      const mlRaw = data.ml_probability;
+      const mlPct = mlRaw == null ? null : Math.round(mlRaw * 100);
+      const rulesPct = Math.min(100, data.rules_score || 0);
+      const color = gaugeColor(data.classification);
 
-      // Verdict + stats (static structure, escaped values)
+      // ── Verdict badge row ──
       const header = document.createElement("div");
       header.style.cssText = "display:flex; align-items:center; gap:10px;";
       const badge = document.createElement("span");
@@ -323,24 +390,79 @@
       }
       container.appendChild(header);
 
-      // Stats row
-      const statsDiv = document.createElement("div");
-      statsDiv.className = "stat-row";
-      for (const [lbl, val] of [["Confidence", confPct + "%"], ["ML Prob", mlPct], ["Rules", String(data.rules_score)]]) {
-        const stat = document.createElement("div");
-        stat.className = "stat";
-        const sl = document.createElement("div");
-        sl.className = "stat-label";
-        sl.textContent = lbl;
-        const sv = document.createElement("div");
-        sv.className = "stat-value";
-        sv.textContent = val;
-        stat.appendChild(sl);
-        stat.appendChild(sv);
-      }
-      container.appendChild(statsDiv);
+      // ── Confidence gauge with ML vs Rules breakdown ──
+      const gauge = document.createElement("div");
+      gauge.className = "confidence-gauge";
 
-      // Sender history
+      // SVG ring (safe DOM creation — no innerHTML)
+      const ring = document.createElement("div");
+      ring.className = "gauge-ring";
+      const radius = 30, circumference = 2 * Math.PI * radius;
+      const offset = circumference - (confPct / 100) * circumference;
+
+      const svg = createSvgEl("svg", { width: "72", height: "72", viewBox: "0 0 72 72" });
+      svg.appendChild(createSvgEl("circle", {
+        cx: "36", cy: "36", r: String(radius), fill: "none",
+        stroke: "var(--border)", "stroke-width": "6"
+      }));
+      const arc = createSvgEl("circle", {
+        cx: "36", cy: "36", r: String(radius), fill: "none",
+        stroke: color, "stroke-width": "6", "stroke-linecap": "round",
+        "stroke-dasharray": String(circumference), "stroke-dashoffset": String(offset)
+      });
+      arc.style.transition = "stroke-dashoffset 0.6s ease";
+      svg.appendChild(arc);
+      ring.appendChild(svg);
+
+      const lbl = document.createElement("div");
+      lbl.className = "gauge-label";
+      lbl.style.color = color;
+      lbl.textContent = confPct + "%";
+      ring.appendChild(lbl);
+      gauge.appendChild(ring);
+
+      // Breakdown bars
+      const breakdown = document.createElement("div");
+      breakdown.className = "gauge-breakdown";
+
+      function addBar(parent, labelText, pct, barColor, displayVal) {
+        const row = document.createElement("div");
+        row.className = "gauge-bar-row";
+        const lab = document.createElement("span");
+        lab.className = "gauge-bar-label";
+        lab.textContent = labelText;
+        row.appendChild(lab);
+        const track = document.createElement("div");
+        track.className = "gauge-bar-track";
+        const fill = document.createElement("div");
+        fill.className = "gauge-bar-fill";
+        fill.style.width = pct + "%";
+        fill.style.background = barColor;
+        track.appendChild(fill);
+        row.appendChild(track);
+        const val = document.createElement("span");
+        val.className = "gauge-bar-value";
+        val.textContent = displayVal;
+        row.appendChild(val);
+        parent.appendChild(row);
+      }
+
+      addBar(breakdown, "ML Model", mlPct != null ? mlPct : 0,
+        mlPct != null ? "#6366f1" : "var(--border)",
+        mlPct != null ? mlPct + "%" : "N/A");
+      addBar(breakdown, "Rules", rulesPct, "#f59e0b", rulesPct + "%");
+
+      const weightNote = document.createElement("div");
+      weightNote.style.cssText = "font-size:10px; color:var(--muted); margin-top:2px;";
+      weightNote.textContent = mlPct != null
+        ? "Final score: 70% ML + 30% Rules"
+        : "ML unavailable \u2014 using rules only";
+      breakdown.appendChild(weightNote);
+
+      gauge.appendChild(breakdown);
+      container.appendChild(gauge);
+
+      // ── Sender history ──
       if (data.sender_history && data.sender_history.times_flagged > 0) {
         const histDiv = document.createElement("div");
         histDiv.style.cssText = "margin-top:12px; padding:8px 12px; background:var(--sus-bg); border:1px solid var(--sus-border); border-radius:8px; font-size:13px; color:var(--sus-text);";
@@ -348,14 +470,19 @@
         container.appendChild(histDiv);
       }
 
-      // Rule hits
+      // ── Rule hits with source tags ──
       if (data.rule_hits && data.rule_hits.length) {
         const h4 = document.createElement("h4");
-        h4.textContent = "Why?";
+        h4.textContent = "Why? (" + data.rule_hits.length + " signals)";
         container.appendChild(h4);
         const ul = document.createElement("ul");
         for (const h of data.rule_hits.slice(0, 10)) {
           const li = document.createElement("li");
+          const tagType = ruleTagType(h.id);
+          const tag = document.createElement("span");
+          tag.className = "rule-tag rule-tag-" + tagType;
+          tag.textContent = tagType === "enrichment" ? "DNS" : tagType === "blocklist" ? "BLOCK" : "RULE";
+          li.appendChild(tag);
           const b = document.createElement("b");
           b.textContent = h.id;
           li.appendChild(b);
@@ -376,7 +503,7 @@
         container.appendChild(noRules);
       }
 
-      // Enrichment
+      // ── Enrichment ──
       if (data.enrichment) {
         const h4e = document.createElement("h4");
         h4e.textContent = "Domain Enrichment";
@@ -407,7 +534,7 @@
         }
       }
 
-      // Extracted links (text only, no clickable hrefs for safety)
+      // ── Extracted links (with overflow handling) ──
       if (data.extracted_links && data.extracted_links.length) {
         const h4l = document.createElement("h4");
         h4l.textContent = "Extracted links";
@@ -416,6 +543,7 @@
         for (const link of data.extracted_links.slice(0, 8)) {
           if (!/^https?:\/\//i.test(link)) continue;
           const li = document.createElement("li");
+          li.className = "link-text";
           li.textContent = link;
           ull.appendChild(li);
         }
